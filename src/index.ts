@@ -302,29 +302,17 @@ function getPlayerHTML(botName: string): string {
       window.addEventListener('message', function(event) {
   const msg = event.data;
   if (!msg || typeof msg !== 'object') return;
-
+  
   if (msg.jsonrpc === '2.0') {
     if (msg.method === 'ui/notifications/tool-input') {
       contentEl.innerHTML = '<div class="loading">Generating voice...</div>';
     }
-
     if (msg.method === 'ui/notifications/tool-result') {
       const structured = msg.params?.structuredContent;
       if (structured) handleData(structured);
     }
   }
-
-  if (msg.structuredContent) {
-    handleData(msg.structuredContent);
-  }
-
-  if (msg.result?.structuredContent) {
-    handleData(msg.result.structuredContent);
-  }
-
-  if (msg.params?.structuredContent) {
-    handleData(msg.params.structuredContent);
-  }
+  if (msg.structuredContent) handleData(msg.structuredContent);
 });
     setTimeout(function() { sendToHost('ui/notifications/initialized', {}); }, 50);
   </script>
