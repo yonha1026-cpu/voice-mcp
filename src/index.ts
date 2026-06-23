@@ -483,8 +483,7 @@ export default {
       const server = createVoiceServer(env);
       const handler = createMcpHandler(server, {
         route: null as unknown as string,
-        sessionIdGenerator: undefined,
-        enableJsonResponse: true,
+        sessionIdGenerator: undefined
       });
       return handler(request, env, ctx);
     }
