@@ -299,26 +299,33 @@ function getPlayerHTML(botName: string): string {
     function sendToHost(method, params, id) {
       const msg = { jsonrpc: '2.0', method: method, params: params || {} };
       if (id !== undefined) msg.id = id;
-      window.parent.postMessage(msg, '*');
+      window.addEventListener('message', function(event) {
+  const msg = event.data;
+  if (!msg || typeof msg !== 'object') return;
+
+  if (msg.jsonrpc === '2.0') {
+    if (msg.method === 'ui/notifications/tool-input') {
+      contentEl.innerHTML = '<div class="loading">Generating voice...</div>';
     }
-    
-    window.addEventListener('message', function(event) {
-      const msg = event.data;
-      if (!msg || typeof msg !== 'object') return;
-      
-      if (msg.jsonrpc === '2.0') {
-        if (msg.method === 'ui/notifications/tool-input') {
-          contentEl.innerHTML = '<div class="loading">Generating voice...</div>';
-        }
-        if (msg.method === 'ui/notifications/tool-result') {
-          const structured = msg.params?.structuredContent;
-          if (structured) handleData(structured);
-        }
-      }
-      if (msg.structuredContent) handleData(msg.structuredContent);
-    });
-    
-    sendToHost('ui/initialize', { name: 'voice-mcp', version: '1.0.0' }, 1);
+
+    if (msg.method === 'ui/notifications/tool-result') {
+      const structured = msg.params?.structuredContent;
+      if (structured) handleData(structured);
+    }
+  }
+
+  if (msg.structuredContent) {
+    handleData(msg.structuredContent);
+  }
+
+  if (msg.result?.structuredContent) {
+    handleData(msg.result.structuredContent);
+  }
+
+  if (msg.params?.structuredContent) {
+    handleData(msg.params.structuredContent);
+  }
+});
     setTimeout(function() { sendToHost('ui/notifications/initialized', {}); }, 50);
   </script>
 </body>
